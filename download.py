@@ -16,6 +16,7 @@ def getListOfDirToDownload():
     file=open("dir-names.txt")
     for dir in file:
         dirList.append(dir)
+    file.close()
     return dirList
 
 directoryList = ['/data/d01/kba2013/aws-publicdatasets/trec/kba/kba-streamcorpus-2013-v0_2_0-english-and-unknown-language',\
