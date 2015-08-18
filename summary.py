@@ -125,13 +125,15 @@ def printDockerInstances():
             self.status=status
             self.ports=ports
             self.names=names
-    dockerInstanceList = check_output(["docker", "ps", "-a"]).split('\n')
+    dockerInstanceInfoList = check_output(["docker", "ps", "-a"]).split('\n')
     firstLine=None
-    for dockerinstance in dockerInstanceList:
+    for dockerinstance in dockerInstanceInfoList:
         if firstLine == None:
             firstLine = True
             continue
-        dI = DockerInstance(dockerinstance[0:20].strip(), dockerinstance[20:40].strip(), dockerinstance[40:60].strip(), dockerinstance[60:80].strip(), dockerinstance[80:100].strip(), dockerinstance[100:120].strip(), dockerinstance[120:140].strip())
+        dI = DockerInstance(dockerinstance[0:20].strip(), dockerinstance[20:47].strip(), dockerinstance[47:70].strip(),
+                           dockerinstance[70:90].strip(), dockerinstance[90:120].strip(),
+                           dockerinstance[120:130].strip(), dockerinstance[130:150].strip())
         dockerInstanceList.append(dI)
 
 printDockerImages()
