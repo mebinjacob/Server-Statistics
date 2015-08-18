@@ -1,69 +1,97 @@
 <html>
 <head>
-<link rel="stylesheet" type="text/css" href="summary.css">
+    <link rel="stylesheet" type="text/css" href="summary.css">
 </head>
-	<body>
-	<div>
-		<table style="border: 1px solid black; border-collapse: collapse;">
-			<tr>
-				<th style="border: 1px solid black;">Folder Path</th>
-	    		<th style="border: 1px solid black;">Size of folder</th>
-	    		<th style="border: 1px solid black;">Number of files</th>
-	  		</tr>
-	  		#foreach ($folderSummary in $folderSummaryList)
- 				<tr>
- 					<td style="border: 1px solid black;">$folderSummary.folderPath</td>
- 					<td style="border: 1px solid black;">$folderSummary.folderSize</td>
- 					<td style="border: 1px solid black;">$folderSummary.noOfFiles</td>
- 				</tr>
-			#end
-	  	</table>	
-	  </div>
-	  <br />
-	  <div>
-	  	Summary: GB/TB free in dataset, tmp filesystems
-	  	<table style="border: 1px solid black; border-collapse: collapse;">
-			<tr>
-				<th style="border: 1px solid black;">Folder Path</th>
-	    		<th style="border: 1px solid black;">Size</th>
-	    		<th style="border: 1px solid black;">Used</th>
-	    		<th style="border: 1px solid black;">Avail</th>
-	    		<th style="border: 1px solid black;">Use%</th>
-	  		</tr>
-	  		#foreach ($us in $usageSummaryList)
- 				<tr>
- 					<td style="border: 1px solid black;">$us.path</td>
- 					<td style="border: 1px solid black;">$us.size</td>
- 					<td style="border: 1px solid black;">$us.used</td>
- 					<td style="border: 1px solid black;">$us.avail</td>
- 					<td style="border: 1px solid black;">$us.usedPercent</td>
- 				</tr>
-			#end
-	  	</table>
-	  	
-	  </div>	
-	  <br/>
-	  <div>
-	  	Summary: Docker images 
-	  	<table style="border: 1px solid black; border-collapse: collapse;">
-			<tr>
-				<th style="border: 1px solid black;">Repository</th>
-	    		<th style="border: 1px solid black;">Tag</th>
-	    		<th style="border: 1px solid black;">Image Id</th>
-	    		<th style="border: 1px solid black;">CREATED</th>
-	    		<th style="border: 1px solid black;">VIRTUAL SIZE</th>
-	  		</tr>
-	  		#foreach ($di in $dockerImagesList)
- 				<tr>
- 					<td style="border: 1px solid black;">$di.repo</td>
- 					<td style="border: 1px solid black;">$di.tag</td>
- 					<td style="border: 1px solid black;">$di.id</td>
- 					<td style="border: 1px solid black;">$di.created</td>
- 					<td style="border: 1px solid black;">$di.virtualSize</td>
- 				</tr>
-			#end
-	  	</table>
-	  </div>
+<body>
+<div>
+    <table style="border: 1px solid black; border-collapse: collapse;">
+        <tr>
+            <th style="border: 1px solid black;">Folder Path</th>
+            <th style="border: 1px solid black;">Size of folder</th>
+            <th style="border: 1px solid black;">Number of files</th>
+        </tr>
+        #foreach ($folderSummary in $folderSummaryList)
+        <tr>
+            <td style="border: 1px solid black;">$folderSummary.folderPath</td>
+            <td style="border: 1px solid black;">$folderSummary.folderSize</td>
+            <td style="border: 1px solid black;">$folderSummary.noOfFiles</td>
+        </tr>
+        #end
+    </table>
+</div>
+<br/>
 
-	</body>
+<div>
+    Summary: GB/TB free in filesystems
+    <table style="border: 1px solid black; border-collapse: collapse;">
+        <tr>
+            <th style="border: 1px solid black;">Folder Path</th>
+            <th style="border: 1px solid black;">Size</th>
+            <th style="border: 1px solid black;">Used</th>
+            <th style="border: 1px solid black;">Avail</th>
+            <th style="border: 1px solid black;">Use%</th>
+        </tr>
+        #foreach ($us in $usageSummaryList)
+        <tr>
+            <td style="border: 1px solid black;">$us.path</td>
+            <td style="border: 1px solid black;">$us.size</td>
+            <td style="border: 1px solid black;">$us.used</td>
+            <td style="border: 1px solid black;">$us.avail</td>
+            <td style="border: 1px solid black;">$us.usedPercent</td>
+        </tr>
+        #end
+    </table>
+
+</div>
+<br/>
+
+<div>
+    Summary: Docker images
+    <table style="border: 1px solid black; border-collapse: collapse;">
+        <tr>
+            <th style="border: 1px solid black;">Repository</th>
+            <th style="border: 1px solid black;">Tag</th>
+            <th style="border: 1px solid black;">Image Id</th>
+            <th style="border: 1px solid black;">CREATED</th>
+            <th style="border: 1px solid black;">VIRTUAL SIZE</th>
+        </tr>
+        #foreach ($di in $dockerImagesList)
+        <tr>
+            <td style="border: 1px solid black;">$di.repo</td>
+            <td style="border: 1px solid black;">$di.tag</td>
+            <td style="border: 1px solid black;">$di.id</td>
+            <td style="border: 1px solid black;">$di.created</td>
+            <td style="border: 1px solid black;">$di.virtualSize</td>
+        </tr>
+        #end
+    </table>
+</div>
+
+
+<div>
+    Summary: Docker instances
+    <table style="border: 1px solid black; border-collapse: collapse;">
+        <tr>
+            <th style="border: 1px solid black;">Container ID</th>
+            <th style="border: 1px solid black;">Image</th>
+            <th style="border: 1px solid black;">COMMAND</th>
+            <th style="border: 1px solid black;">CREATED</th>
+            <th style="border: 1px solid black;">STATUS</th>
+            <th style="border: 1px solid black;">PORTS</th>
+            <th style="border: 1px solid black;">NAMES</th>
+        </tr>
+        #foreach ($di in dockerInstanceList)
+        <tr>
+            <td style="border: 1px solid black;">$di.container_id</td>
+            <td style="border: 1px solid black;">$di.image</td>
+            <td style="border: 1px solid black;">$di.command</td>
+            <td style="border: 1px solid black;">$di.created</td>
+            <td style="border: 1px solid black;">$di.status</td>
+            <td style="border: 1px solid black;">$di.ports</td>
+            <td style="border: 1px solid black;">$di.names</td>
+        </tr>
+        #end
+    </table>
+</div>
+</body>
 </html>

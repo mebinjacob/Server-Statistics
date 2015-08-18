@@ -15,6 +15,7 @@ emailAddresses =  configParser.get('Email_Address', 'emails')
 folderSummaryList = []
 usageSummaryList = []
 dockerImagesList = []
+dockerInstanceList = []
 mailString=''
 #################End of global variables passed to view################
 base_folders=path.split(",")
@@ -99,7 +100,6 @@ def printDockerImages():
         self.virtualSize = virtualSize
 
   dockerImagesInfoList = check_output(["docker", "images"]).split('\n')
-  # print dockerImagesInfoList
   firstLine = None
   for dockerImages in dockerImagesInfoList:
     if firstLine == None:
@@ -107,8 +107,35 @@ def printDockerImages():
       continue
     dI = DockerImages(dockerImages[0:20].strip(), dockerImages[20:40].strip(), dockerImages[40:60].strip(), dockerImages[60:80].strip(), dockerImages[80:100].strip())
     dockerImagesList.append(dI)
-  # print dockerImagesList
+
+def printDockerInstances():
+    class DockerInstance:
+        container_id=''
+        image=''
+        command=''
+        created=''
+        status=''
+        ports=''
+        names=''
+        def __init__(self, container_id, image, command, created, status, ports, names):
+            self.container_id=container_id
+            self.image=image
+            self.command=command
+            self.created=created
+            self.status=status
+            self.ports=ports
+            self.names=names
+    dockerInstanceList = check_output(["docker", "ps", "-a"]).split('\n')
+    firstLine=None
+    for dockerinstance in dockerInstanceList:
+        if firstLine == None:
+            firstLine = True
+            continue
+        dI = DockerInstance(dockerinstance[0:20].strip(), dockerinstance[20:40].strip(), dockerinstance[40:60].strip(), dockerinstance[60:80].strip(), dockerinstance[80:100].strip(), dockerinstance[100:120].strip())
+        dockerInstanceList.append(dI)
+
 printDockerImages()
+printDockerInstances()
 template = airspeed.Template(templateString)
 mailString = template.merge(locals())
 print mailString
