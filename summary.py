@@ -131,7 +131,7 @@ def printDockerInstances():
         if firstLine == None:
             firstLine = True
             continue
-        dI = DockerInstance(dockerinstance[0:20].strip(), dockerinstance[20:40].strip(), dockerinstance[40:60].strip(), dockerinstance[60:80].strip(), dockerinstance[80:100].strip(), dockerinstance[100:120].strip())
+        dI = DockerInstance(dockerinstance[0:20].strip(), dockerinstance[20:40].strip(), dockerinstance[40:60].strip(), dockerinstance[60:80].strip(), dockerinstance[80:100].strip(), dockerinstance[100:120].strip(), dockerinstance[120:140].strip())
         dockerInstanceList.append(dI)
 
 printDockerImages()
