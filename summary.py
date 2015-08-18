@@ -1,19 +1,30 @@
 #!/usr/bin/python
 #dependency airspeed
 import requests
-#import pystache
 import airspeed
+import ConfigParser
 from subprocess import check_output
 
+#configuration reading utility
+configParser = ConfigParser.RawConfigParser()
+configFilePath = r'property.ini'
+configParser.read(configFilePath)
+path = configParser.get('Folders', 'folderList')
+emailAddresses =  configParser.get('Email_Address', 'emails')
+################Global variables passed to view########################
+folderSummaryList = []
+usageSummaryList = []
+dockerImagesList = []
 mailString=''
-base_folders=['/data/tmp/']
+#################End of global variables passed to view################
+base_folders=path.split(",")
 #mailgun attributes are hardcoded, change if you want to use another account!!
 def send_simple_message():
     return requests.post(
         "https://api.mailgun.net/v3/sandbox4ad92269e9dd4ec6af5a43db995df318.mailgun.org/messages",
         auth=("api", "key-03786fc32080a30fb6e38060f03fe25f"),
         data={"from": "SM321 Server <mailgun@sandbox4ad92269e9dd4ec6af5a43db995df318.mailgun.org>",
-              "to": ["mebinjacob@gmail.com"],
+              "to": ["mebinjacob@gmail.com"],#"mebinjacob@gmail.com"
               "subject": "Sm321 - Usage Summary Report",
               "html": mailString,
               })
@@ -43,8 +54,6 @@ class UsageSummary:
 
 templateString=''
 summaryFile = open('summaryReport.txt', 'w')
-folderSummaryList = []
-usageSummaryList = []
 with open ("template.html", "r") as templateFile:
     templateString=templateFile.read()
 for folder in base_folders:
@@ -89,17 +98,18 @@ def printDockerImages():
         self.created = created
         self.virtualSize = virtualSize
 
-  dockerImagesList = []
   dockerImagesInfoList = check_output(["docker", "images"]).split('\n')
+  # print dockerImagesInfoList
   firstLine = None
   for dockerImages in dockerImagesInfoList:
-    if firstLine:
+    if firstLine == None:
       firstLine = True
       continue
     dI = DockerImages(dockerImages[0:20].strip(), dockerImages[20:40].strip(), dockerImages[40:60].strip(), dockerImages[60:80].strip(), dockerImages[80:100].strip())
     dockerImagesList.append(dI)
-
+  # print dockerImagesList
+printDockerImages()
 template = airspeed.Template(templateString)
 mailString = template.merge(locals())
 print mailString
-#send_simple_message()
+send_simple_message()
