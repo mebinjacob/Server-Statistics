@@ -3,7 +3,9 @@
     <link rel="stylesheet" type="text/css" href="summary.css">
 </head>
 <body>
+#if ( $folderSummaryList.__len__() 0)
 <div>
+    Summary: Dataset and tmp folder summary
     <table style="border: 1px solid black; border-collapse: collapse;">
         <tr>
             <th style="border: 1px solid black;">Folder Path</th>
@@ -20,7 +22,8 @@
     </table>
 </div>
 <br/>
-
+#end
+#if ( $usageSummaryList.__len__() > 0)
 <div>
     Summary: GB/TB free in filesystems
     <table style="border: 1px solid black; border-collapse: collapse;">
@@ -41,10 +44,9 @@
         </tr>
         #end
     </table>
-
 </div>
 <br/>
-
+#end
 <div>
     Summary: Docker images
     <table style="border: 1px solid black; border-collapse: collapse;">
@@ -66,32 +68,56 @@
         #end
     </table>
 </div>
-
+<br/>
 
 <div>
-    Summary: Docker instances
+    Summary: Docker Instances
     <table style="border: 1px solid black; border-collapse: collapse;">
         <tr>
-            <th style="border: 1px solid black;">Container ID</th>
-            <th style="border: 1px solid black;">Image</th>
-            <th style="border: 1px solid black;">COMMAND</th>
+            <th style="border: 1px solid black;">Repository</th>
+            <th style="border: 1px solid black;">Tag</th>
+            <th style="border: 1px solid black;">Image Id</th>
             <th style="border: 1px solid black;">CREATED</th>
-            <th style="border: 1px solid black;">STATUS</th>
+            <th style="border: 1px solid black;">VIRTUAL SIZE</th>
             <th style="border: 1px solid black;">PORTS</th>
             <th style="border: 1px solid black;">NAMES</th>
         </tr>
-        #foreach ($di in dockerInstanceList)
+        #foreach ($dis in $dockerInstanceList)
         <tr>
-            <td style="border: 1px solid black;">$di.container_id</td>
-            <td style="border: 1px solid black;">$di.image</td>
-            <td style="border: 1px solid black;">$di.command</td>
-            <td style="border: 1px solid black;">$di.created</td>
-            <td style="border: 1px solid black;">$di.status</td>
-            <td style="border: 1px solid black;">$di.ports</td>
-            <td style="border: 1px solid black;">$di.names</td>
+            <td style="border: 1px solid black;">$dis.container_id</td>
+            <td style="border: 1px solid black;">$dis.image</td>
+            <td style="border: 1px solid black;">$dis.command</td>
+            <td style="border: 1px solid black;">$dis.created</td>
+            <td style="border: 1px solid black;">$dis.status</td>
+            <td style="border: 1px solid black;">$dis.ports</td>
+            <td style="border: 1px solid black;">$dis.names</td>
         </tr>
         #end
     </table>
 </div>
+<br/>
+
+<div>
+    Summary of CPU and I/O usage per user
+    <table style="border: 1px solid black; border-collapse: collapse;">
+        <tr>
+            <th style="border: 1px solid black;">USER NAME</th>
+            <th style="border: 1px solid black;">CPU(Sum of system and user time in cpu minutes)</th>
+            <th style="border: 1px solid black;">Elapsed Time in minutes</th>
+            <th style="border: 1px solid black;">Total Number of I/O operations</th>
+            <th style="border: 1px solid black;">CPU-TIME averaged core usage, in 1k units</th>
+        </tr>
+        #foreach ($cpuIOUsage in $cpuIOUsageList)
+        <tr>
+            <td style="border: 1px solid black;">$cpuIOUsage.userName</td>
+            <td style="border: 1px solid black;">$cpuIOUsage.cpu</td>
+            <td style="border: 1px solid black;">$cpuIOUsage.elapsedTime</td>
+            <td style="border: 1px solid black;">$cpuIOUsage.totalIO</td>
+            <td style="border: 1px solid black;">$cpuIOUsage.cpuAvg</td>
+        </tr>
+        #end
+    </table>
+</div>
+
 </body>
 </html>
