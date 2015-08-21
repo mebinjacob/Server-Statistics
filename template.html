@@ -3,7 +3,7 @@
     <link rel="stylesheet" type="text/css" href="summary.css">
 </head>
 <body>
-#if ( $folderSummaryList.__len__() 0)
+#if ( $folderSummaryList.__len__())
 <div>
     Summary: Dataset and tmp folder summary
     <table style="border: 1px solid black; border-collapse: collapse;">
@@ -74,11 +74,11 @@
     Summary: Docker Instances
     <table style="border: 1px solid black; border-collapse: collapse;">
         <tr>
-            <th style="border: 1px solid black;">Repository</th>
-            <th style="border: 1px solid black;">Tag</th>
-            <th style="border: 1px solid black;">Image Id</th>
+            <th style="border: 1px solid black;">CONTAINER ID</th>
+            <th style="border: 1px solid black;">IMAGE</th>
+            <th style="border: 1px solid black;">COMMAND</th>
             <th style="border: 1px solid black;">CREATED</th>
-            <th style="border: 1px solid black;">VIRTUAL SIZE</th>
+            <th style="border: 1px solid black;">STATUS</th>
             <th style="border: 1px solid black;">PORTS</th>
             <th style="border: 1px solid black;">NAMES</th>
         </tr>

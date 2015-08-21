@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # dependency airspeed
-#install airspeed, by typing
-#sudo ./summar.py install, inside airspeed directory
+# install airspeed, by typing
+# sudo ./summary.py install, inside airspeed directory
 import requests
 import airspeed
 import ConfigParser
@@ -31,9 +31,9 @@ def send_simple_message():
     return requests.post(
         "https://api.mailgun.net/v3/sandbox4ad92269e9dd4ec6af5a43db995df318.mailgun.org/messages",
         auth=("api", "key-03786fc32080a30fb6e38060f03fe25f"),
-        data={"from": "SM321 Server <mailgun@sandbox4ad92269e9dd4ec6af5a43db995df318.mailgun.org>",
-              "to": ["mebinjacob@gmail.com"],  # "mebinjacob@gmail.com"
-              "subject": serverName+" - Usage Summary Report",
+        data={"from": serverName + " Server <mailgun@sandbox4ad92269e9dd4ec6af5a43db995df318.mailgun.org>",
+              "to": [emailAddresses],  # "mebinjacob@gmail.com"
+              "subject": serverName + " - Usage Summary Report",
               "html": mailString,
               })
 
@@ -127,6 +127,34 @@ def printDockerImages():
         dockerImagesList.append(dI)
 
 
+# splits the string by two spaces and gets the strings and not the spaces
+def getStringList(string, headerPos):
+    stringList = []
+    index = 1
+    stringList.append(string[0:headerPos[0]].strip())
+    for header in headerPos:
+        if index < len(headerPos):
+            stringList.append(string[header:headerPos[index]].strip())
+            index += 1
+    stringList.append(string[headerPos[index-1]:].strip())
+    return stringList
+
+
+def getFromList(list, index):
+    if index >= len(list):
+        return ''
+    else:
+        return list[index]
+
+def getHeaderPos(firstLine, firstLineKeywords):
+    headerPos = []
+    index = 1
+    for key in firstLineKeywords:
+                if index < len(firstLineKeywords):
+                    headerPos.append( firstLine.find(firstLineKeywords[index]))
+                    index += 1
+    return headerPos
+
 def printDockerInstances():
     class DockerInstance:
         container_id = ''
@@ -148,30 +176,37 @@ def printDockerInstances():
 
     dockerInstanceInfoList = check_output(["docker", "ps", "-a"]).split('\n')
     firstLine = None
+
+    firstLineKeywords=['CONTAINER ID', 'IMAGE', 'COMMAND', 'CREATED', 'STATUS', 'PORTS', 'NAMES']
+    headerPos = []
     for dockerinstance in dockerInstanceInfoList:
         if firstLine == None:
             firstLine = True
+            headerPos = getHeaderPos(dockerinstance, firstLineKeywords)
             continue
         if dockerinstance == '':
             continue
-        dI = DockerInstance(dockerinstance[0:20].strip(), dockerinstance[20:47].strip(), dockerinstance[47:70].strip(),
-                            dockerinstance[70:90].strip(), dockerinstance[90:120].strip(),
-                            dockerinstance[120:130].strip(), dockerinstance[130:150].strip())
+        stringList = getStringList(dockerinstance, headerPos)
+        dI = DockerInstance(getFromList(stringList, 0), getFromList(stringList, 1), getFromList(stringList, 2),
+                            getFromList(stringList, 3), getFromList(stringList, 4),
+                            getFromList(stringList, 5), getFromList(stringList, 6))
         dockerInstanceList.append(dI)
+
 
 def printCPUAndIOUsageSummary():
     class CPUIOSummary:
-        userName=''
-        cpu=''
-        elapsedTime=''
-        totalIO=''
-        cpuAvg=''
+        userName = ''
+        cpu = ''
+        elapsedTime = ''
+        totalIO = ''
+        cpuAvg = ''
+
         def __init__(self, userName, cpu, elapsedTime, totalIO, cpuAvg):
-            self.userName=userName
-            self.cpu=cpu
-            self.elapsedTime=elapsedTime
-            self.totalIO=totalIO
-            self.cpuAvg=cpuAvg
+            self.userName = userName
+            self.cpu = cpu
+            self.elapsedTime = elapsedTime
+            self.totalIO = totalIO
+            self.cpuAvg = cpuAvg
 
     cpuIOUsageInfoList = check_output(["sa", "-D", "--user-summary"]).split('\n')
     firstLine = None
@@ -182,8 +217,9 @@ def printCPUAndIOUsageSummary():
         if cpuIOUsage == '':
             continue
         cI = CPUIOSummary(cpuIOUsage[0:20].strip(), cpuIOUsage[60:70].strip(), cpuIOUsage[50:60].strip(),
-                           cpuIOUsage[70:80].strip(), cpuIOUsage[80:100].strip())
+                          cpuIOUsage[70:80].strip(), cpuIOUsage[80:100].strip())
         cpuIOUsageList.append(cI)
+
 
 printDockerImages()
 printDockerInstances()
@@ -191,3 +227,4 @@ printCPUAndIOUsageSummary()
 template = airspeed.Template(templateString)
 mailString = template.merge(locals())
 send_simple_message()
+# print mailString

@@ -1,3 +1,4 @@
+#this has nothing to do with server usage reporting, but is used to find out what is missing in kba dataset and so is dir-names.txt
 import requests
 import os
 
