@@ -25,6 +25,35 @@ mailString = ''
 #################End of global variables passed to view################
 base_folders = path.split(",")
 
+def getHeaderPos(firstLine, firstLineKeywords):
+    headerPos = []
+    index = 1
+    for key in firstLineKeywords:
+                if index < len(firstLineKeywords):
+                    headerPos.append( firstLine.find(firstLineKeywords[index]))
+                    index += 1
+    return headerPos
+
+
+
+def getStringList(string, headers):
+    stringList = []
+    index = 1
+    stringList.append(string[0:headers[0]].strip())
+    for header in headers:
+        if index < len(headers):
+            stringList.append(string[header:headers[index]].strip())
+            index += 1
+    stringList.append(string[headers[index-1]:].strip())
+    return stringList
+
+
+def getFromList(list, index):
+    if index >= len(list):
+        return ''
+    else:
+        return list[index]
+
 
 # mailgun attributes are hardcoded, change if you want to use another account!!
 def send_simple_message():
@@ -89,11 +118,14 @@ for folder in base_folders:
             folderSummaryList.append(fs)
 
     # usage summary of /data/dataset and /data/tmp folders only
-    usageSummaryStringList = check_output(["df", "-h", folder]).split('\n')[1].split(' ')
-    usageSummarySize = usageSummaryStringList[2]
-    usageSummaryUsed = usageSummaryStringList[4]
-    usageSummaryAvail = usageSummaryStringList[6]
-    usageSummaryUsedPercent = usageSummaryStringList[8]
+    keywords = ['Filesystem', 'Size', 'Used', 'Avail', 'Use%', 'Mounted on']
+    usageSummaryString = check_output(["df", "-h", folder]).split('\n')[1]
+    headers = getHeaderPos(check_output(["df", "-h", folder]).split('\n')[0], keywords)
+    usageSummaryStringList = getStringList(usageSummaryString, headers)
+    usageSummarySize = usageSummaryStringList[1]
+    usageSummaryUsed = usageSummaryStringList[2]
+    usageSummaryAvail = usageSummaryStringList[3]
+    usageSummaryUsedPercent = usageSummaryStringList[4]
     us = UsageSummary(folder, usageSummarySize, usageSummaryUsed, usageSummaryAvail, usageSummaryUsedPercent)
     usageSummaryList.append(us)
 
@@ -127,33 +159,6 @@ def printDockerImages():
         dockerImagesList.append(dI)
 
 
-# splits the string by two spaces and gets the strings and not the spaces
-def getStringList(string, headerPos):
-    stringList = []
-    index = 1
-    stringList.append(string[0:headerPos[0]].strip())
-    for header in headerPos:
-        if index < len(headerPos):
-            stringList.append(string[header:headerPos[index]].strip())
-            index += 1
-    stringList.append(string[headerPos[index-1]:].strip())
-    return stringList
-
-
-def getFromList(list, index):
-    if index >= len(list):
-        return ''
-    else:
-        return list[index]
-
-def getHeaderPos(firstLine, firstLineKeywords):
-    headerPos = []
-    index = 1
-    for key in firstLineKeywords:
-                if index < len(firstLineKeywords):
-                    headerPos.append( firstLine.find(firstLineKeywords[index]))
-                    index += 1
-    return headerPos
 
 def printDockerInstances():
     class DockerInstance:
