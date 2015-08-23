@@ -22,6 +22,7 @@ dockerImagesList = []
 dockerInstanceList = []
 cpuIOUsageList = []
 mailString = ''
+warningString=''
 #################End of global variables passed to view################
 base_folders = path.split(",")
 
@@ -59,7 +60,7 @@ def getFromList(list, index):
 def send_simple_message():
     return requests.post(
         "https://api.mailgun.net/v3/sandbox4ad92269e9dd4ec6af5a43db995df318.mailgun.org/messages",
-        auth=("api", "key-03786fc32080a30fb6e38060f03fe25f"),
+        auth=("api", ""),
         data={"from": serverName + " Server <mailgun@sandbox4ad92269e9dd4ec6af5a43db995df318.mailgun.org>",
               "to": [emailAddresses],  # "mebinjacob@gmail.com"
               "subject": serverName + " - Usage Summary Report",
@@ -225,11 +226,27 @@ def printCPUAndIOUsageSummary():
                           cpuIOUsage[70:80].strip(), cpuIOUsage[80:100].strip())
         cpuIOUsageList.append(cI)
 
+warningString= ''
+def summary():
+    usageWarningFolders = ''
+    for usageSummary in usageSummaryList:
+        if int(usageSummary.usedPercent.replace("%", '')) > 90:
+            usageWarningFolders += usageSummary.pathgu
+    if not usageWarningFolders == '':
+        warningString='The space usage for the following folders is more than 90% of there allocated space'
+        for usageWarningFolder in usageWarningFolders:
+            warningString += ' ' + usageWarningFolder
+    else:
+        warningString='The space usage seems fine for '
+        for folder in base_folders:
+            warningString = warningString + folder + ' '
 
 printDockerImages()
 printDockerInstances()
 printCPUAndIOUsageSummary()
+summary()
+print warningString
 template = airspeed.Template(templateString)
 mailString = template.merge(locals())
-send_simple_message()
+# send_simple_message()
 # print mailString
