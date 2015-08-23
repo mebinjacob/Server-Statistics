@@ -13,8 +13,10 @@ configParser = ConfigParser.RawConfigParser()
 configFilePath = r'property.ini'
 configParser.read(configFilePath)
 path = configParser.get('Folders', 'folderList')
-emailAddresses = configParser.get('Email_Address', 'emails')
-serverName = configParser.get('Server_Details', 'name')
+emailAddresses = configParser.get('Mailgun_config', 'to')
+from_email = configParser.get('Mailgun_config', 'from')
+email_subject=configParser.get('Mailgun_config', 'subject')
+api_key=configParser.get('Mailgun_config', 'api_key')
 ################Global variables passed to view########################
 folderSummaryList = []
 usageSummaryList = []
@@ -58,15 +60,13 @@ def getFromList(list, index):
 
 # mailgun attributes are hardcoded, change if you want to use another account!!
 def send_simple_message():
-    return requests.post(
+     return requests.post(
         "https://api.mailgun.net/v3/sandbox4ad92269e9dd4ec6af5a43db995df318.mailgun.org/messages",
-        auth=("api", ""),
-        data={"from": serverName + " Server <mailgun@sandbox4ad92269e9dd4ec6af5a43db995df318.mailgun.org>",
-              "to": [emailAddresses],  # "mebinjacob@gmail.com"
-              "subject": serverName + " - Usage Summary Report",
-              "html": mailString,
-              })
-
+        auth=("api", api_key),
+        data={"from": from_email,
+              "to": [emailAddresses],
+              "subject": email_subject,
+              "html": mailString})
 
 class folderSummary:
     folderPath = ''
@@ -226,27 +226,27 @@ def printCPUAndIOUsageSummary():
                           cpuIOUsage[70:80].strip(), cpuIOUsage[80:100].strip())
         cpuIOUsageList.append(cI)
 
-warningString= ''
 def summary():
-    usageWarningFolders = ''
+    usageWarningFolders = []
     for usageSummary in usageSummaryList:
         if int(usageSummary.usedPercent.replace("%", '')) > 90:
-            usageWarningFolders += usageSummary.pathgu
-    if not usageWarningFolders == '':
-        warningString='The space usage for the following folders is more than 90% of there allocated space'
-        for usageWarningFolder in usageWarningFolders:
-            warningString += ' ' + usageWarningFolder
-    else:
+            usageWarningFolders.append(usageSummary.path)
+
+    if usageWarningFolders == '':
         warningString='The space usage seems fine for '
         for folder in base_folders:
             warningString = warningString + folder + ' '
+    else:
+        warningString='The space usage for the following folders is more than 90% of there allocated space'
+        for usageWarningFolder in usageWarningFolders:
+            warningString = warningString + ' ' + usageWarningFolder + ','
+    return warningString
 
 printDockerImages()
 printDockerInstances()
 printCPUAndIOUsageSummary()
-summary()
-print warningString
+warningString = summary()
 template = airspeed.Template(templateString)
 mailString = template.merge(locals())
-# send_simple_message()
-# print mailString
+send_simple_message()
+print mailString
