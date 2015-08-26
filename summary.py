@@ -60,8 +60,8 @@ def getFromList(list, index):
 
 # mailgun attributes are hardcoded, change if you want to use another account!!
 def send_simple_message():
-     return requests.post(
-        "https://api.mailgun.net/v3/sandbox4ad92269e9dd4ec6af5a43db995df318.mailgun.org/messages",
+        return requests.post(
+	"https://api.mailgun.net/v3/sandbox4ad92269e9dd4ec6af5a43db995df318.mailgun.org/messages",
         auth=("api", api_key),
         data={"from": from_email,
               "to": [emailAddresses],
@@ -232,14 +232,29 @@ def summary():
         if int(usageSummary.usedPercent.replace("%", '')) > 90:
             usageWarningFolders.append(usageSummary.path)
 
-    if usageWarningFolders == '':
+    if len(usageWarningFolders) == 0:
         warningString='The space usage seems fine for '
         for folder in base_folders:
             warningString = warningString + folder + ' '
     else:
-        warningString='The space usage for the following folders is more than 90% of there allocated space'
-        for usageWarningFolder in usageWarningFolders:
-            warningString = warningString + ' ' + usageWarningFolder + ','
+        warningString='The space usage for the following folders is more than 90% of there allocated space<br/>'
+	for usageWarningFolder in usageWarningFolders:
+		warningString = warningString + ' ' + usageWarningFolder + ','
+
+    postgres_error = '<br/>postgres is not running on this instance!!<br/>'
+    hadoop_error = '<br/>hadoop docker instance is not running on this server!!<br/>'
+
+    for instance in dockerInstanceList:
+        if instance.names == 'dsr-hadoop':
+            postgres_error = '<br/>hadoop docker is running on this instance<br/>'
+            if instance.status.find('Up') == -1:
+                postgres_error = postgres_error + 'but is not Up i.e. has is not UP!!<br/>'
+        if instance.names == 'dsr-postgres':
+            postgres_error = '<br/>postgres docker instance is present on this server<br/>'
+            if  instance.status.find('Up') == -1:
+                postgres_error = postgres_error + 'but is not Up i.e. status is not UP!!<br/>'
+    warningString = warningString + postgres_error
+    warningString = warningString + hadoop_error
     return warningString
 
 printDockerImages()
@@ -249,4 +264,3 @@ warningString = summary()
 template = airspeed.Template(templateString)
 mailString = template.merge(locals())
 send_simple_message()
-print mailString
